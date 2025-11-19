@@ -6,10 +6,8 @@
   // CONFIGURAÇÕES GERAIS
   // ==========================
 
-  // URL da API Django (ajuste se usar prefixo, subdomínio etc.)
   const API_URL = "/api/odontoia-chat/";
 
-  // Informações da clínica (pode vir do template Django depois)
   const CLINIC_INFO = {
     name: "Clínica Odontológica",
     city: "Curitiba - PR",
@@ -17,14 +15,11 @@
     tone: "linguagem humanizada, clara e acolhedora",
   };
 
-  // Histórico de mensagens enviado para a API
   let chatHistory = [];
-
-  // Flag se o chat está aberto
   let isOpen = false;
 
   // ==========================
-  // SELEÇÃO DE ELEMENTOS DOM
+  // ELEMENTOS DOM
   // ==========================
 
   const chatBtn = document.getElementById("chatbot-btn");
@@ -34,9 +29,7 @@
   const chatInput = document.getElementById("chatbot-input");
 
   if (!chatBtn || !chatWindow || !chatMessages || !chatForm || !chatInput) {
-    console.warn(
-      "⚠️ [OdontoIA Chat] Elementos do chatbot não encontrados. Verifique os IDs no HTML."
-    );
+    console.warn("⚠️ Elementos do chatbot não encontrados.");
     return;
   }
 
@@ -44,7 +37,6 @@
   // FUNÇÕES AUXILIARES
   // ==========================
 
-  // Abre/fecha a janela do chat
   function toggleChat() {
     isOpen = !isOpen;
     if (isOpen) {
@@ -56,12 +48,10 @@
     }
   }
 
-  // Rolagem automática para a última mensagem
   function scrollToBottom() {
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
-  // Cria e adiciona uma bolha de mensagem no DOM
   function addMessageBubble(role, text, options = {}) {
     const msgWrapper = document.createElement("div");
     msgWrapper.classList.add("chatbot-message-row");
@@ -70,11 +60,9 @@
     const bubble = document.createElement("div");
     bubble.classList.add("chatbot-bubble");
 
-    if (options.isThinking) {
-      bubble.classList.add("chatbot-thinking");
-    }
+    if (options.isThinking) bubble.classList.add("chatbot-thinking");
 
-    bubble.textContent = text;
+    bubble.innerHTML = text;
     msgWrapper.appendChild(bubble);
 
     chatMessages.appendChild(msgWrapper);
@@ -83,17 +71,26 @@
     return bubble;
   }
 
-  // Mostra mensagem inicial do bot
+  function addBotMessage(text) {
+    addMessageBubble("assistant", text);
+  }
+
+  function addUserMessage(text) {
+    addMessageBubble("user", text);
+  }
+
   function showWelcomeMessage() {
     const welcome =
       "Olá! 👋 Sou o OdontoIA Chat. Posso te ajudar com dúvidas sobre tratamentos, valores aproximados e como agendar uma consulta 😀";
-    addMessageBubble("assistant", welcome);
+    addBotMessage(welcome);
     chatHistory.push({ role: "assistant", content: welcome });
   }
 
-  // Envia mensagem para a API Django
+  // ==========================
+  // ENVIO À API DJANGO
+  // ==========================
+
   async function sendMessageToAPI(userMessage) {
-    // Monta o payload
     const payload = {
       message: userMessage,
       history: chatHistory,
@@ -102,65 +99,139 @@
 
     const response = await fetch(API_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || "Erro ao se comunicar com a API.");
-    }
-
     const data = await response.json();
-    if (!data.reply) {
-      throw new Error("Resposta inválida da API.");
-    }
-
-    return data.reply;
+    return data;
   }
 
   // ==========================
-  // EVENTOS
+  // EVENTOS DO CHATBOT
   // ==========================
 
-  // Clique no botão flutuante abre/fecha o chat
   chatBtn.addEventListener("click", () => {
     toggleChat();
 
-    // Primeira abertura, mostra mensagem de boas-vindas
     if (isOpen && chatHistory.length === 0) {
       showWelcomeMessage();
     }
   });
 
-  // Fechar ao clicar fora (opcional, se quiser depois dá pra tirar)
   document.addEventListener("click", (event) => {
-    const clickedInside =
+    const inside =
       chatWindow.contains(event.target) || chatBtn.contains(event.target);
-
-    if (!clickedInside && isOpen) {
-      toggleChat();
-    }
+    if (!inside && isOpen) toggleChat();
   });
 
-  // Envio do formulário
+  // ============================================================
+  // PASSO 6 — CAPTURA DE LEADS (NOME + TELEFONE)
+  // ============================================================
+
+  let waitingLeadName = false;
+  let waitingLeadPhone = false;
+  let tempLeadName = "";
+  let leadAlreadySent = false;
+
+  async function sendLeadToBackend(name, phone, firstMessage) {
+    try {
+      const res = await fetch("/api/save-lead/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          phone,
+          first_message: firstMessage,
+          clinic_name: CLINIC_INFO.name,
+        }),
+      });
+
+      return await res.json();
+    } catch (e) {
+      console.error("Erro ao enviar lead:", e);
+      return { success: false };
+    }
+  }
+
+  function activateLeadFlow(firstMessage) {
+    if (leadAlreadySent) return;
+
+    waitingLeadName = true;
+    addBotMessage(
+      "Claro! 😊 Para que a equipe da clínica te chame, posso anotar seus dados.<br><br>Qual é o seu <b>nome</b>?"
+    );
+  }
+
+  async function handleLeadFlow(userText, firstMessage) {
+    // Perguntar nome
+    if (waitingLeadName) {
+      tempLeadName = userText;
+      waitingLeadName = false;
+      waitingLeadPhone = true;
+
+      addBotMessage(
+        `Perfeito, <b>${tempLeadName}</b>! Agora me envie seu <b>WhatsApp</b> com DDD:`
+      );
+      return true;
+    }
+
+    // Perguntar telefone
+    if (waitingLeadPhone) {
+      const phone = userText.replace(/\D/g, "");
+
+      if (phone.length < 10) {
+        addBotMessage(
+          "Parece incompleto 🤔<br>Me envie o número completo com DDD (ex: 41998765432)"
+        );
+        return true;
+      }
+
+      waitingLeadPhone = false;
+
+      const result = await sendLeadToBackend(
+        tempLeadName,
+        phone,
+        firstMessage
+      );
+
+      if (result.success) {
+        leadAlreadySent = true;
+        addBotMessage(
+          "Obrigado! 🙌<br>A equipe da clínica vai te chamar em breve."
+        );
+      } else {
+        addBotMessage(
+          "Tive um problema ao salvar seus dados 😞<br>Pode tentar novamente?"
+        );
+      }
+
+      return true;
+    }
+
+    return false;
+  }
+
+  // ============================================================
+  // ENVIO DA MENSAGEM DO USUÁRIO
+  // ============================================================
+
   chatForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const userMessage = chatInput.value.trim();
     if (!userMessage) return;
 
-    // Adiciona mensagem do usuário
-    addMessageBubble("user", userMessage);
+    addUserMessage(userMessage);
     chatHistory.push({ role: "user", content: userMessage });
 
-    // Limpa input
     chatInput.value = "";
     chatInput.focus();
 
-    // Adiciona bolha de "digitando..."
+    // LEAD FLOW → intercepta
+    const leadHandled = await handleLeadFlow(userMessage, userMessage);
+    if (leadHandled) return;
+
     const thinkingBubble = addMessageBubble(
       "assistant",
       "Digitando...",
@@ -168,26 +239,29 @@
     );
 
     try {
-      const reply = await sendMessageToAPI(userMessage);
+      const data = await sendMessageToAPI(userMessage);
 
-      // Atualiza bolha de "digitando..." com a resposta real
-      thinkingBubble.textContent = reply;
+      thinkingBubble.innerHTML = data.reply;
       thinkingBubble.classList.remove("chatbot-thinking");
 
-      chatHistory.push({ role: "assistant", content: reply });
+      chatHistory.push({ role: "assistant", content: data.reply });
       scrollToBottom();
+
+      // API pediu para coletar lead?
+      if (data.collect_lead === true && !leadAlreadySent) {
+        activateLeadFlow(userMessage);
+      }
     } catch (error) {
-      console.error("Erro no chatbot:", error);
-      thinkingBubble.textContent =
-        "Desculpe, tive um problema para responder agora. Tente novamente em instantes.";
+      console.error("Erro:", error);
+      thinkingBubble.innerHTML =
+        "Desculpe, tive um problema para responder agora. Tente novamente.";
       thinkingBubble.classList.remove("chatbot-thinking");
     }
   });
 
-  // Enviar com Enter (sem Shift)
-  chatInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
+  chatInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
       chatForm.dispatchEvent(new Event("submit"));
     }
   });

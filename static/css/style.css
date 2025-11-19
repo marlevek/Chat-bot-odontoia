@@ -70,6 +70,31 @@ section {
 }
 
 /* ===============================
+   AVATAR
+   =============================== */
+.avatar {
+    background: #fff;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    font-weight: bold;
+    color: #1A0066;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.4rem;
+}
+
+.avatar-img {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+}
+
+
+/* ===============================
    BOTÕES
    =============================== */
 
@@ -193,6 +218,10 @@ footer {
 }
 
 @media (max-width: 992px) {
+
+    .sidebar{
+        padding-top: 70px !important;
+    }
     .navbar-collapse {
         background-color: #1A0066 !important;
         padding: 12px;

@@ -1,0 +1,265 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - OdontoIA Chat</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: #f5f6fb;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px;
+            background: #1A0066;
+            color: #fff;
+            padding: 25px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-270px);
+        }
+
+        /* conteúdo principal */
+        .main-content {
+            margin-left: 260px;
+            transition: margin-left 0.3s ease;
+            padding: 20px;
+        }
+
+        .main-content.full {
+            margin-left: 0;
+        }
+
+    .menu-toggle {
+    display: none;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    background: #1A0066;
+    color: white;
+    border: none;
+    padding: 10px 13px;
+    border-radius: 10px;
+    font-size: 1.3rem;
+    z-index: 2000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+        .avatar {
+            background: #fff;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            font-weight: bold;
+            color: #1A0066;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.4rem;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: #e7e7ff;
+            margin-bottom: 6px;
+            text-decoration: none;
+            font-size: 1.05rem;
+            transition: 0.2s;
+        }
+
+        .sidebar a:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        @media (max-width: 992px) {
+            .menu-toggle {
+                display: block;
+            }
+            .sidebar {
+                transform: translateX(-270px);
+            }
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+
+        /* ===============================
+   CORREÇÃO DO MENU NO MOBILE
+   =============================== */
+
+/* Aumenta espaço no topo da sidebar no mobile */
+@media (max-width: 992px) {
+    #sidebar {
+        padding-top: 90px !important; /* empurra o logo para baixo */
+    }
+}
+
+/* Ajusta o botão hamburguer (não ficar em cima do logo) */
+#menuBtn {
+    top: 15px !important;
+    left: 15px !important;
+    z-index: 3000 !important;
+}
+    </style>
+</head>
+
+<body>
+
+<body>
+
+<!-- BOTÃO HAMBÚRGUER (mobile) -->
+<button class="menu-toggle" id="menuBtn">☰</button>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+
+    <div class="d-flex align-items-center mb-4">
+
+        <!-- AVATAR PERSONALIZADO -->
+        {% if clinic.avatar %}
+            <img src="{{ clinic.avatar.url }}" class="avatar-img me-3" />
+        {% else %}
+            <div class="avatar me-3">
+                {{ clinic.name|slice:":1" }}
+            </div>
+        {% endif %}
+
+        <!-- INFOS DA CLÍNICA -->
+        <div>
+            <div class="fw-bold">{{ clinic.name }}</div>
+            <small class="text-light">{{ clinic.city }}</small>
+        </div>
+    </div>
+
+    <h4 class="mb-3">Menu</h4>
+
+    <a href="/dashboard/">📊 Painel</a>
+    <a href="/embed-code/">💻 Código Embed</a>
+    <a href="/logout/">🔒 Sair</a>
+
+</div>
+
+<!-- ÁREA PRINCIPAL -->
+<div class="main-content" id="main">
+
+    <h1 class="fw-bold mb-4 text-center">Painel da Clínica</h1>
+
+    <!-- CONFIG -->
+    <div class="card shadow-sm p-4 mb-4">
+        <h5 class="mb-3">Configurações do Chatbot</h5>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label">Nome da Clínica</label>
+                    {{ form.name }}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Cidade</label>
+                    {{ form.city }}
+                </div>
+
+                <div class="col-12 mt-3">
+                    <label class="form-label">Mensagem de boas-vindas</label>
+                    {{ form.welcome_message }}
+                </div>
+
+                <div class="col-12 mt-3">
+                    <label class="form-label">Tratamentos</label>
+                    {{ form.treatments }}
+                </div>
+
+                <div class="col-md-4 mt-3">
+                    <label class="form-label">Cor do Chatbot</label>
+                    {{ form.primary_color }}
+                </div>
+            </div>
+<div class="col-md-6 mt-3">
+    <label class="form-label">Logo / Avatar da Clínica</label>
+    <input type="file" name="avatar" class="form-control">
+    
+    {% if clinic.avatar %}
+        <p class="mt-2">Avatar atual:</p>
+        <img src="{{ clinic.avatar.url }}" style="width:80px; height:80px; border-radius:10px; object-fit:cover;">
+    {% endif %}
+</div>
+            <button class="btn btn-primary mt-4">Salvar alterações</button>
+        </form>
+    </div>
+
+    <!-- LEADS -->
+    <div class="card shadow-sm p-4">
+        <h5 class="mb-3">Leads Recebidos</h5>
+
+        {% if leads %}
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Nome</th>
+                            <th>Telefone</th>
+                            <th>Mensagem</th>
+                            <th>Data</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for lead in leads %}
+                        <tr>
+                            <td>{{ lead.name }}</td>
+                            <td>{{ lead.phone }}</td>
+                            <td>{{ lead.first_message|truncatechars:45 }}</td>
+                            <td>{{ lead.created_at|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted">Nenhum lead recebido ainda.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+<script>
+    const sidebar = document.getElementById("sidebar");
+    const menuBtn = document.getElementById("menuBtn");
+
+    // abre/fecha lateral
+    menuBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        sidebar.classList.toggle("show");
+    });
+
+    // fecha ao clicar fora
+    document.addEventListener("click", (e) => {
+        const isClickInsideSidebar = sidebar.contains(e.target);
+        const isClickOnMenuBtn = menuBtn.contains(e.target);
+
+        if (!isClickInsideSidebar && !isClickOnMenuBtn) {
+            sidebar.classList.remove("show");
+        }
+    });
+</script>
+
+</body>
+</html>

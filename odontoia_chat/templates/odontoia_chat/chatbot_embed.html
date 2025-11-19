@@ -1,0 +1,19 @@
+<div id="chatbot-btn" class="chatbot-btn">
+    💬
+</div>
+
+<div id="chatbot-window" class="chatbot-window chatbot-closed">
+
+    <div class="chatbot-header" style="background: {{ clinic.color }}">
+        <span>{{ clinic.name }}</span>
+        <button class="chatbot-close-btn">×</button>
+    </div>
+
+    <div id="chatbot-messages" class="chatbot-messages"></div>
+
+    <form id="chatbot-form" class="chatbot-form">
+        <textarea id="chatbot-input" class="chatbot-input"
+            placeholder="Digite sua mensagem..." rows="1"></textarea>
+        <button type="submit" class="chatbot-send-btn">➤</button>
+    </form>
+</div>
