@@ -1,2 +1,16 @@
-venv    
+# Database
+*.sqlite3
+*.db
+db.sqlite3
+
+# Environments
 .env
+*.env
+venv/
+env/
+
+# Django
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
