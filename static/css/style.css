@@ -1,0 +1,208 @@
+/* ===============================
+   ESTILO GLOBAL CoderTec / OdontoIA
+   =============================== */
+
+/* Fonte padrão */
+body {
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    background-color: #ffffff;
+    color: #222;
+    line-height: 1.6;
+}
+
+/* Reset suave */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Títulos principais */
+h1, h2, h3, h4 {
+    font-weight: 700;
+    color: #003f7a;
+}
+
+/* Parágrafos */
+p {
+    color: #444;
+}
+
+/* Links */
+a {
+    text-decoration: none;
+    color: #0052a6;
+    transition: 0.2s ease;
+}
+
+a:hover {
+    color: #003d7a;
+}
+
+/* ===============================
+   SEÇÕES PADRÃO
+   =============================== */
+
+section {
+    padding: 60px 0;
+}
+
+@media (max-width: 768px) {
+    section {
+        padding: 40px 0;
+    }
+}
+
+/* ===============================
+   HERO (caso a landing não tenha estilo próprio)
+   =============================== */
+
+.hero-default {
+    background: linear-gradient(135deg, #0a67c7, #003d7a);
+    color: white;
+    padding: 80px 0;
+    text-align: center;
+}
+
+.hero-default h1,
+.hero-default p {
+    color: white;
+}
+
+/* ===============================
+   BOTÕES
+   =============================== */
+
+.btn-primary {
+    background-color: #0052a6 !important;
+    border-color: #0052a6 !important;
+}
+
+.btn-primary:hover {
+    background-color: #003d7a !important;
+}
+
+.btn-outline-primary {
+    border-color: #0052a6 !important;
+    color: #0052a6 !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: #0052a6 !important;
+    color: white !important;
+}
+
+/* ===============================
+   NAVBAR
+   =============================== */
+
+.navbar-brand img {
+    height: 38px;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+    margin-left: 10px;
+}
+
+.navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.navbar-toggler-icon {
+    filter: invert(1) brightness(2);
+}
+
+
+/* ===============================
+   FOOTER
+   =============================== */
+
+footer {
+    font-size: 0.95rem;
+}
+
+/* ===============================
+   CARDS (benefícios, recursos, planos)
+   =============================== */
+
+.card-clean {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    padding: 22px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+    transition: 0.25s ease;
+}
+
+.card-clean:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.10);
+}
+
+/* ===============================
+   MOBILE OPTIMIZED
+   =============================== */
+
+@media (max-width: 480px) {
+    h1 { font-size: 1.8rem; }
+    h2 { font-size: 1.4rem; }
+
+    .navbar-brand img {
+        height: 32px;
+    }
+
+    .card-clean {
+        padding: 18px;
+    }
+}
+
+/* ===============================
+   ANIMAÇÕES SUAVES (global)
+   =============================== */
+
+.fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeIn 0.8s ease forwards;
+}
+
+.fade-in-delay {
+    animation-delay: 0.3s;
+}
+
+.fade-in-delay-2 {
+    animation-delay: 0.6s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===============================
+   ESPAÇAMENTO GLOBAL
+   =============================== */
+
+.mt-6 { margin-top: 4rem; }
+.mb-6 { margin-bottom: 4rem; }
+
+@media (max-width: 768px) {
+    .mt-6 { margin-top: 2.5rem; }
+    .mb-6 { margin-bottom: 2.5rem; }
+}
+
+@media (max-width: 992px) {
+    .navbar-collapse {
+        background-color: #1A0066 !important;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 8px;
+    }
+
+    .navbar-nav .nav-link {
+        padding-left: 10px;
+        padding-right: 10px;
+        margin-bottom: 4px;
+    }
+}

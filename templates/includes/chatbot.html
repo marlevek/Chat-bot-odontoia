@@ -1,0 +1,24 @@
+<!-- BOTÃO FLUTUANTE DO CHATBOT -->
+<div id="chatbot-btn" class="chatbot-btn">
+    💬
+</div>
+
+<!-- JANELA DO CHATBOT -->
+<div id="chatbot-window" class="chatbot-window chatbot-closed">
+
+    <!-- Cabeçalho -->
+    <div class="chatbot-header">
+        <span>OdontoIA Chat</span>
+        <button class="chatbot-close-btn" onclick="document.getElementById('chatbot-btn').click()">×</button>
+    </div>
+
+    <!-- Área de mensagens -->
+    <div id="chatbot-messages" class="chatbot-messages"></div>
+
+    <!-- Campo de envio -->
+    <form id="chatbot-form" class="chatbot-form">
+        <textarea id="chatbot-input" class="chatbot-input" placeholder="Digite sua mensagem..." rows="1"></textarea>
+        <button type="submit" class="chatbot-send-btn">➤</button>
+    </form>
+
+</div>

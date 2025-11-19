@@ -1,0 +1,109 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>{% block title %}OdontoIA Chat — CoderTec{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="favicon" href="{% static 'img/odontoiachat-favicon.png' %}">
+
+    <!-- Estilos Globais -->
+    <link rel="stylesheet" href="{% static 'css/chatbot.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    <!-- ========================= -->
+    <!-- 🔵 NAVBAR (opcional) -->
+    <!-- ========================= -->
+    <nav class="navbar navbar-expand-lg" style="background-color: #1A0066;">
+        <div class="container">
+
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="#">
+                <img src="{% static 'img/odontoiachat-logo.png' %}" alt="Logo OdontoIA Chat" style="height: 60px;">
+            </a>
+
+            <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#mainMenu"
+                aria-controls="mainMenu" aria-expanded="false" aria-label="Menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainMenu">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link text-white" href="/">Início</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="#planos">Planos</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="#demo">Demo</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="#contato">Contato</a></li>
+                </ul>
+            </div>
+
+        </div>
+    </nav>
+
+
+
+    <!-- ========================= -->
+    <!--            CONTENT        -->
+    <!-- ========================= -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ========================= -->
+    <!-- 🔻 FOOTER -->
+    <!-- ========================= -->
+    <footer class="py-4 text-center text-white mt-5" style="background-color: #1A0066;">
+        <p class="mb-0">© {{ now|date:"Y" }} CoderTec — Soluções em IA, Automação e Web</p>
+    </footer>
+
+
+    <!-- ========================= -->
+    <!-- 🤖 CHATBOT (HTML) -->
+    <!-- ========================= -->
+
+    <!-- ========================= -->
+    <!-- 🔗 SCRIPTS -->
+    <!-- ========================= -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/chatbot.js' %}" defer></script>
+
+    <script>
+        document.addEventListener("click", function (e) {
+            const navbar = document.getElementById("mainMenu");
+            const isOpen = navbar.classList.contains("show");
+            const toggle = document.querySelector(".navbar-toggler");
+
+            // Se o menu está aberto e o clique NÃO for na área do menu ou no botão, fecha
+            if (isOpen && !navbar.contains(e.target) && !toggle.contains(e.target)) {
+                toggle.click(); // Fecha o menu
+            }
+        });
+    </script>
+<script>
+document.querySelectorAll('.navbar-nav .nav-link').forEach(function(link) {
+    link.addEventListener("click", function() {
+        const toggle = document.querySelector(".navbar-toggler");
+        const menu = document.getElementById("mainMenu");
+
+        if (menu.classList.contains("show")) {
+            toggle.click();
+        }
+    });
+});
+</script>
+
+    {% include 'includes/chatbot.html' %}
+
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>
